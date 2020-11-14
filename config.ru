@@ -1,4 +1,5 @@
-require_relative 'app'
+require_relative 'time_app'
 
-run App.new
+use Rack::Reloader
+run TimeApp.new
 
