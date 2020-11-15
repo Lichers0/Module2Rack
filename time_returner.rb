@@ -16,12 +16,10 @@ class TimeReturner
   class << self
     def call(params_string)
       @params = params_string.split(',').map(&:to_sym)
-      p @params
       unsupported_params
     end
 
     def unsupported_params
-      p DATE_TIME
       @unsupported_params ||= @params.select { |param| !DATE_TIME.include?(param) }
     end
 
@@ -54,6 +52,4 @@ class TimeReturner
       end.compact.join(separator)
     end
   end
-
 end
-

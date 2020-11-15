@@ -1,5 +1,4 @@
 require_relative 'time_returner'
-require "byebug"
 
 class TimeApp
   def initialize
