@@ -1,40 +1,59 @@
 class TimeReturner
-  TIME_FORMAT = { year: "year",
-                  month: "month",
-                  day: "day",
-                  hour: "hour",
-                  minute: "min",
-                  second: "sec" }.freeze
+  DATE_FORMATS = {
+    year:   "%Y",
+    month:  "%m",
+    day:    "%d"
+  }.freeze
 
-  def initialize(params_string)
-    @params = params_string.split(',')
-    time_process
-  end
+  TIME_FORMATS = {
+    hour: "%H",
+    minute: "%M",
+    second: "%S"
+  }.freeze
 
-  def time_process
-    @incorrect_params = []
-    @result_time = []
-    time = Time.new
-    @params.each do |param|
-      if TIME_FORMAT[param.to_sym]
-        @result_time << time.send(TIME_FORMAT[param.to_sym])
-      else
-        @incorrect_params << param
-      end
+  DATE_TIME = DATE_FORMATS.keys + TIME_FORMATS.keys
+
+  class << self
+    def call(params_string)
+      @params = params_string.split(',').map(&:to_sym)
+      p @params
+      unsupported_params
+    end
+
+    def unsupported_params
+      p DATE_TIME
+      @unsupported_params ||= @params.select { |param| !DATE_TIME.include?(param) }
+    end
+
+    def success?
+      @unsupported_params.empty?
+    end
+
+    def error
+      @unsupported_params
+    end
+
+    def result
+      @strftime_format = "#{date_strftime} #{time_strftime}"
+      Time.now.strftime(@strftime_format)
+    end
+
+    private
+
+    def date_strftime
+      select_strftime_from(DATE_FORMATS, '-')
+    end
+
+    def time_strftime
+      select_strftime_from(TIME_FORMATS, ':')
+    end
+
+    def select_strftime_from(hash, separator)
+      hash.map do |format, strftime|
+        @params.include?(format) ? strftime : nil
+      end.compact.join(separator)
     end
   end
 
-  def result
-    return if unknown_params?
-    @result_time.join('-')
-  end
-
-  def unknown_params?
-    @incorrect_params.any?
-  end
-
-  def unknown_params
-    @incorrect_params
-  end
 end
 
